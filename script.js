@@ -1,4 +1,4 @@
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1KWscfymE3K7qXvRaFSDKcYZdYQ0qjb-Cs44clpJ_l4c/gviz/tq?tqx=out:json';
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1GjYYSJWa9-nOSWJnZrmLBJGb4c7JItYTGsVruKVa6tM/gviz/tq?tqx=out:json';
 
 async function fetchData() {
 try {
