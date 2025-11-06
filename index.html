@@ -6,30 +6,61 @@
 <title>🌪️ Mesonet Dashboard</title>
 <style>
 body {
-font-family: Arial, sans-serif;
-background: linear-gradient(to bottom, #003366, #0055aa);
+background: linear-gradient(135deg, #001f3f, #0074D9);
 color: white;
+font-family: "Segoe UI", Roboto, sans-serif;
 text-align: center;
-padding: 2em;
+margin: 0;
+padding: 20px;
 }
-h1 { font-size: 2em; }
-.data-box {
-display: inline-block;
+h1 {
+font-size: 2.5em;
+margin-bottom: 10px;
+}
+.data {
+font-size: 1.3em;
+line-height: 1.8em;
 background: rgba(255,255,255,0.1);
-border-radius: 10px;
-padding: 1em 2em;
-margin: 1em;
-font-size: 1.2em;
+border-radius: 8px;
+padding: 15px;
+display: inline-block;
+margin-top: 10px;
 }
-.timestamp { margin-top: 1.5em; color: #ccc; }
+footer {
+font-size: 0.9em;
+margin-top: 20px;
+opacity: 0.7;
+}
 </style>
 </head>
 <body>
-<h1>🌪️ Mesonet Live Dashboard</h1>
-<div id="dashboard"></div>
-<p class="timestamp" id="timestamp">Loading...</p>
+<h1>🌪️ Live Mesonet Dashboard</h1>
+<div class="data" id="mesonet-data">Loading data...</div>
 
-<script src="script.js"></script>
+<footer>Updated every 1 second from Google Sheets</footer>
+
+<script>
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/1GjYYSJWa9-nOSWJnZrmLBJGb4c7JItYTGsVruKVa6tM/edit?gid=0#gid=0";
+const dataBox = document.getElementById("mesonet-data");
+
+async function fetchData() {
+try {
+const response = await fetch(SHEET_URL);
+const text = await response.text();
+const rows = text.split("\n").map(r => r.split(","));
+let output = "";
+for (let i = 0; i < rows.length; i++) {
+if (rows[i][0]) output += `${rows[i][0]}<br>`;
+}
+dataBox.innerHTML = output;
+} catch (err) {
+dataBox.innerHTML = "⚠️ Error loading data.";
+console.error(err);
+}
+}
+
+fetchData();
+setInterval(fetchData, 1000); // refresh every 1 second
+</script>
 </body>
 </html>
-
