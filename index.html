@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Live Mesonet Dashboard</title>
 <style>
 body {
@@ -29,33 +29,37 @@ color: #ff5555;
 <h1>🌪️ Live Mesonet Dashboard</h1>
 <p>Updated every 1 second from Google Sheets</p>
 
-<!-- ✅ This div is REQUIRED -->
+<!-- ✅ This MUST exist -->
 <div id="data">Loading data...</div>
 
+<!-- ✅ Place script at the very bottom -->
 <script>
-// ⚙️ Replace with your actual "published to web" CSV link
-const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSytzFWEarglEI45Km6463QZ_UeBXThZf32NLcB-Hbnj13YaL7v7QYrGsdWQFaaR_9gO6ESMp-ox3sh/pub?output=csv";
+// ⚙️ Replace with your actual published CSV link
+const sheetUrl =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vSytzFWEarglEI45Km6463QZ_UeBXThZf32NLcB-Hbnj13YaL7v7QYrGsdWQFaaR_9gO6ESMp-ox3sh/pub?output=csv";
 
 const updateInterval = 1000; // 1 second
 
 async function fetchSheetData() {
+const dataDiv = document.getElementById("data");
+if (!dataDiv) return; // Safety check
+
 try {
 const response = await fetch(sheetUrl + "&nocache=" + new Date().getTime());
 if (!response.ok) throw new Error("HTTP " + response.status);
 const csvText = await response.text();
-
 const rows = csvText.trim().split("\n").map(r => r.split(","));
 renderData(rows);
 } catch (err) {
 console.error("⚠️ Error fetching data:", err);
-const dataDiv = document.getElementById("data");
-if (dataDiv) dataDiv.innerHTML = `<p class="error">Error loading data</p>`;
+dataDiv.innerHTML = `<p class="error">Error loading data</p>`;
 }
 }
 
 function renderData(rows) {
 const dataDiv = document.getElementById("data");
-if (!dataDiv) return;
+if (!dataDiv) return; // Safety check
+
 let html = "";
 for (let i = 0; i < rows.length; i++) {
 html += `<p>${rows[i].join(" | ")}</p>`;
@@ -63,8 +67,8 @@ html += `<p>${rows[i].join(" | ")}</p>`;
 dataDiv.innerHTML = html;
 }
 
-// ✅ Wait until page fully loads
-window.addEventListener("DOMContentLoaded", () => {
+// ✅ Make sure it runs after the full page loads
+window.addEventListener("load", () => {
 fetchSheetData();
 setInterval(fetchSheetData, updateInterval);
 });
