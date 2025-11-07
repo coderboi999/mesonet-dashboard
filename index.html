@@ -3,47 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌪️ Mesonet Dashboard</title>
+<title>Live Mesonet Dashboard</title>
 <style>
 body {
-background: linear-gradient(135deg, #001f3f, #0074D9);
+background: linear-gradient(to bottom, #003366, #0059b3);
 color: white;
-font-family: "Segoe UI", Roboto, sans-serif;
+font-family: Arial, sans-serif;
 text-align: center;
-margin: 0;
-padding: 20px;
+padding-top: 100px;
 }
 h1 {
-font-size: 2.5em;
-margin-bottom: 10px;
+font-size: 2.5rem;
+margin-bottom: 20px;
 }
-.data {
-font-size: 1.3em;
-line-height: 1.8em;
-background: rgba(255,255,255,0.1);
-border-radius: 8px;
-padding: 15px;
-display: inline-block;
-margin-top: 10px;
-}
-footer {
-font-size: 0.9em;
+#data {
+font-size: 1.2rem;
 margin-top: 20px;
-opacity: 0.7;
+}
+.error {
+color: #ff5555;
 }
 </style>
 </head>
 <body>
 <h1>🌪️ Live Mesonet Dashboard</h1>
-<div class="data" id="mesonet-data">Loading data...</div>
+<p>Updated every 1 second from Google Sheets</p>
 
-<footer>Updated every 1 second from Google Sheets</footer>
+<!-- ✅ This div is REQUIRED -->
+<div id="data">Loading data...</div>
 
 <script>
+// ⚙️ Replace with your actual "published to web" CSV link
 const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSytzFWEarglEI45Km6463QZ_UeBXThZf32NLcB-Hbnj13YaL7v7QYrGsdWQFaaR_9gO6ESMp-ox3sh/pub?output=csv";
-// ⬆️ Replace with your actual published CSV link
 
-const updateInterval = 1000; // 1 second refresh rate
+const updateInterval = 1000; // 1 second
 
 async function fetchSheetData() {
 try {
@@ -51,27 +44,30 @@ const response = await fetch(sheetUrl + "&nocache=" + new Date().getTime());
 if (!response.ok) throw new Error("HTTP " + response.status);
 const csvText = await response.text();
 
-// Parse CSV rows
 const rows = csvText.trim().split("\n").map(r => r.split(","));
 renderData(rows);
 } catch (err) {
 console.error("⚠️ Error fetching data:", err);
-document.getElementById("data").innerHTML = `<p style="color:red;">Error loading data</p>`;
+const dataDiv = document.getElementById("data");
+if (dataDiv) dataDiv.innerHTML = `<p class="error">Error loading data</p>`;
 }
 }
 
 function renderData(rows) {
-// Skip headers and find the latest values
-let html = `<h2>🌪️ Live Mesonet Data</h2>`;
+const dataDiv = document.getElementById("data");
+if (!dataDiv) return;
+let html = "";
 for (let i = 0; i < rows.length; i++) {
-html += `<p>${rows[i][0]}</p>`;
+html += `<p>${rows[i].join(" | ")}</p>`;
 }
-document.getElementById("data").innerHTML = html;
+dataDiv.innerHTML = html;
 }
 
-// Run every 1 second
-setInterval(fetchSheetData, updateInterval);
+// ✅ Wait until page fully loads
+window.addEventListener("DOMContentLoaded", () => {
 fetchSheetData();
+setInterval(fetchSheetData, updateInterval);
+});
 </script>
 </body>
 </html>
