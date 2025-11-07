@@ -1,77 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Live Mesonet Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌪️ Live Mesonet Dashboard</title>
 <style>
 body {
-background: linear-gradient(to bottom, #003366, #0059b3);
-color: white;
+margin: 0;
 font-family: Arial, sans-serif;
+color: #fff;
 text-align: center;
-padding-top: 100px;
+background: url("784FC283-0A4E-42AA-9FE5-88D8A5877E28.png") no-repeat center center fixed;
+background-size: cover;
 }
+
+/* dark overlay for readability */
+body::before {
+content: "";
+position: fixed;
+top: 0; left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.6);
+z-index: 0;
+}
+
+main {
+position: relative;
+z-index: 1;
+padding: 50px 20px;
+}
+
 h1 {
-font-size: 2.5rem;
-margin-bottom: 20px;
+font-size: 2.5em;
+margin-bottom: 10px;
 }
+
 #data {
-font-size: 1.2rem;
-margin-top: 20px;
+margin-top: 30px;
+font-size: 1.2em;
+background: rgba(0, 0, 0, 0.4);
+display: inline-block;
+padding: 20px 40px;
+border-radius: 10px;
 }
-.error {
-color: #ff5555;
+
+footer {
+position: fixed;
+bottom: 15px;
+width: 100%;
+text-align: center;
+font-size: 0.9em;
+color: #ccc;
+z-index: 1;
 }
 </style>
 </head>
 <body>
+<main>
 <h1>🌪️ Live Mesonet Dashboard</h1>
-<p>Updated every 1 second from Google Sheets</p>
-
-<!-- ✅ This MUST exist -->
 <div id="data">Loading data...</div>
+</main>
+<footer>Updated every 1 second from Google Sheets</footer>
 
-<!-- ✅ Place script at the very bottom -->
 <script>
-// ⚙️ Replace with your actual published CSV link
-const sheetUrl =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vSytzFWEarglEI45Km6463QZ_UeBXThZf32NLcB-Hbnj13YaL7v7QYrGsdWQFaaR_9gO6ESMp-ox3sh/pub?output=csv";
-
+// 🔗 Replace this with your actual published CSV link (must start with https://docs.google.com/spreadsheets/d/e/)
+const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSytzFWEarglEI45Km6463QZ_UeBXThZf32NLcB-Hbnj13YaL7v7QYrGsdWQFaaR_9gO6ESMp-ox3sh/pub?output=csv";
 const updateInterval = 1000; // 1 second
 
 async function fetchSheetData() {
-const dataDiv = document.getElementById("data");
-if (!dataDiv) return; // Safety check
-
 try {
 const response = await fetch(sheetUrl + "&nocache=" + new Date().getTime());
 if (!response.ok) throw new Error("HTTP " + response.status);
 const csvText = await response.text();
+
 const rows = csvText.trim().split("\n").map(r => r.split(","));
 renderData(rows);
 } catch (err) {
 console.error("⚠️ Error fetching data:", err);
-dataDiv.innerHTML = `<p class="error">Error loading data</p>`;
+const dataDiv = document.getElementById("data");
+if (dataDiv) dataDiv.innerHTML = `<p style="color:red;">Error loading data</p>`;
 }
 }
 
 function renderData(rows) {
 const dataDiv = document.getElementById("data");
-if (!dataDiv) return; // Safety check
+if (!dataDiv) return;
 
-let html = "";
-for (let i = 0; i < rows.length; i++) {
-html += `<p>${rows[i].join(" | ")}</p>`;
-}
+let html = "<h2>Latest Mesonet Data</h2><table style='margin:auto;text-align:left;'>";
+rows.forEach(row => {
+html += `<tr><td>${row[0]}</td><td>${row[1] || ""}</td></tr>`;
+});
+html += "</table>";
 dataDiv.innerHTML = html;
 }
 
-// ✅ Make sure it runs after the full page loads
-window.addEventListener("load", () => {
-fetchSheetData();
 setInterval(fetchSheetData, updateInterval);
-});
+fetchSheetData();
 </script>
 </body>
 </html>
